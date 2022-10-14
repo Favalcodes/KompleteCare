@@ -59,7 +59,20 @@ export default {
             password: this.password,
           },
         })
+        .then(({ data }) => {
+          try {
+            this.$apolloHelpers.onLogin(data.login)
+            this.$toast.success('Login Successful')
+            this.$router.push('/dashboard')
+          } catch (error) {
+            this.$toast.error(error.message)
+          }
+        })
     },
+  },
+  onMounted() {
+    localStorage.clear()
+    this.$apolloHelpers.onLogout()
   },
 }
 </script>

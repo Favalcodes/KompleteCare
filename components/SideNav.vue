@@ -24,7 +24,7 @@
       :key="index"
       class="secondary-nav"
     >
-      <li v-if="data.isAuth" @click="logout" class="nav-item flex py-4 px-7 items-center">
+      <li v-if="data.isAuth" class="nav-item flex py-4 px-7 items-center" @click="logout">
         <IconComponent :name="data.icon" />
         <p class="label ml-6">{{ data.name }}</p>
       </li>
@@ -113,7 +113,9 @@ export default {
   },
   methods: {
     logout() {
-      console.log('you have logout')
+      this.$apolloHelpers.onLogout()
+      this.$toast.success('Successfully Logged out')
+      this.$router.push('/')
     }
   }
 }

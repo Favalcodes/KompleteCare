@@ -33,12 +33,10 @@ export default {
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/apollo',
-    ['nuxt-tailvue', {toast: true}],
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/apollo',],
+  modules: ['@nuxtjs/apollo', '@nuxtjs/toast'],
 
   apollo: {
     clientConfigs: {
@@ -46,6 +44,11 @@ export default {
         httpEndpoint: 'https://testdrive.kompletecare.com/graphql',
       },
     },
+  },
+
+  toast: {
+    position: 'top-center',
+    duration: 3000,
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

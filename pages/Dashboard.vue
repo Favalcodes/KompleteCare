@@ -10,7 +10,7 @@
           <img :src="profile" alt="" class="login-i" />
         </div>
       </div>
-      <div class="board px-11 lg:pl-16 lg:pr-32">
+      <div class="board px-6 md:px-11 lg:pl-16 lg:pr-32">
         <h1 class="text-2xl lg:text-4xl font-extrabold mb-3">
           Update Patient Medical Record
         </h1>
@@ -28,7 +28,11 @@
                 :key="subfield.id"
                 class="form-group"
               >
-                <input type="checkbox" />
+                <input
+                  v-model="selected"
+                  type="checkbox"
+                  :value="subfield.id"
+                />
                 <label for="" class="text-sm font-bold">{{
                   subfield.title
                 }}</label>
@@ -39,20 +43,24 @@
           <div class="grid gap-x-14 gap-y-3 grid-cols-1 md:grid-cols-2">
             <div class="form-group flex flex-col">
               <label for="" class="text-gray-400 text-sm mb-2">CT Scan</label>
-              <select class="select-input">
+              <select v-model="ctscan" class="select-input">
                 <option hidden>*Specify</option>
                 <option value="abdomen">Abdomen</option>
                 <option value="bone">Bone</option>
                 <option value="brain">Brain</option>
+                <option value="Scan Needed In The Left Cerebral Hemisphere">
+                  Scan Needed In The Left Cerebral Hemisphere
+                </option>
               </select>
             </div>
             <div class="form-group flex flex-col">
               <label for="" class="text-gray-400 text-sm mb-2">MRI</label>
-              <select class="select-input">
+              <select v-model="mri" class="select-input">
                 <option hidden>*Specify</option>
                 <option value="breast_scans">Breast Scan</option>
                 <option value="cardiac">Cardiac</option>
                 <option value="functional_mri">Functional MRI</option>
+                <option value="Full Body MRI">Full Body MRI</option>
               </select>
             </div>
           </div>
@@ -73,82 +81,70 @@
 
 <script>
 import profile from '../assets/svg/pix.png'
+import { GET_LISTS, ME } from '~/graphql/queries'
+import { ADD_RECORD } from '~/graphql/mutations'
 export default {
   name: 'UserDashboard',
-  // middleware: ['authenticated'],
+  middleware: ['authenticated'],
   data() {
     return {
       profile,
-      data: [
-        {
-          id: '1',
-          title: 'X-Ray',
-          investigations: [
-            {
-              id: '1',
-              title: 'Chest',
-            },
-            {
-              id: '2',
-              title: 'Cervical Vertebrae',
-            },
-            {
-              id: '3',
-              title: 'Thoracic Vertebrae',
-            },
-            {
-              id: '4',
-              title: 'Lumbar Vartebrae',
-            },
-            {
-              id: '5',
-              title: 'Lumbo Sacral Vertebrae',
-            },
-            {
-              id: '6',
-              title: 'Wrist Joint',
-            },
-            {
-              id: '7',
-              title: 'Ankle',
-            },
-            {
-              id: '8',
-              title: 'Fingers',
-            },
-            {
-              id: '9',
-              title: 'Toes',
-            },
-          ],
-        },
-        {
-          id: '2',
-          title: 'Ultrasound Scan',
-          investigations: [
-            {
-              id: '10',
-              title: 'Breast',
-            },
-            {
-              id: '11',
-              title: 'Pelvis',
-            },
-            {
-              id: '12',
-              title: 'Prostate',
-            },
-            {
-              id: '13',
-              title: 'Thyroid',
-            },
-          ],
-        },
-      ],
+      data: [],
+      selected: [],
+      ctscan: '',
+      mri: '',
+      user: {},
     }
   },
+  mounted() {
+    this.$apollo
+      .query({
+        query: GET_LISTS,
+      })
+      .then(({ data }) => {
+        try {
+          this.data = data.investigation_types
+        } catch (error) {
+          this.$toast.error(error.message)
+        }
+      })
+    this.$apollo
+      .query({
+        query: ME,
+      })
+      .then(({ data }) => {
+        try {
+          this.user = data.me
+          const recordLength = data.me.records.length
+          const record = data.me.records[recordLength - 1]
+          this.mri = record.mri
+          this.ctscan = record.ctscan
+          this.selected = record.investigations.map((item) => item.id)
+        } catch (error) {
+          this.$toast.error(error.message)
+        }
+      })
+  },
   methods: {
-    send() {},
+    send() {
+      this.$apollo
+        .mutate({
+          mutation: ADD_RECORD,
+          variables: {
+            investigations: this.selected,
+            mri: this.mri,
+            ctscan: this.ctscan,
+            developer: this.user.email,
+          },
+        })
+        .then(() => {
+          try {
+            this.$toast.success('Record added successfully')
+          } catch (error) {
+            this.$toast.error(error.message)
+          }
+        })
+    },
   },
 }
 </script>
