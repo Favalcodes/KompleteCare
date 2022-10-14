@@ -180,7 +180,7 @@ export default {
       .select-input {
         position: relative;
         border: 1px solid #c4c4c4;
-        color: #c4c4c4;
+        color: #827f7f;
         border-radius: 5px;
         padding: 10px 20px;
       }
