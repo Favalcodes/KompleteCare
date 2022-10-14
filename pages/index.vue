@@ -16,16 +16,20 @@
             required
           />
         </div>
-        <div class="form-group flex flex-col mb-4">
+        <div class="form-group flex flex-col mb-1">
           <label for="" class="font-medium text-xl mb-2 text-gray-600"
             >Password</label
           >
           <input
             v-model="password"
-            type="password"
+            :type="show ? 'text' : 'password'"
             class="form-control w-full border-gray-400 border rounded py-1 px-3"
             required
           />
+        </div>
+        <div class="form-group mb-4 flex items-center">
+          <input v-model="show" type="checkbox" class="mr-1">
+          <label for="show" class="text-xs">Show Password</label>
         </div>
         <button
           type="submit"
@@ -45,6 +49,7 @@ export default {
   name: 'IndexPage',
   data() {
     return {
+      show: false,
       email: '',
       password: '',
     }
