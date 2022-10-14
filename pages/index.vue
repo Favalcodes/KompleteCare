@@ -61,9 +61,13 @@ export default {
         })
         .then(({ data }) => {
           try {
-            this.$apolloHelpers.onLogin(data.login)
-            this.$toast.success('Login Successful')
-            this.$router.push('/dashboard')
+            if (data.login === null) {
+              this.$toast.error('Login Unsuccessful, check email or password')
+            } else {
+              this.$apolloHelpers.onLogin(data.login)
+              this.$toast.success('Login Successful')
+              this.$router.push('/dashboard')
+            }
           } catch (error) {
             this.$toast.error(error.message)
           }
